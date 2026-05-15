@@ -1,0 +1,306 @@
+openapi: 3.0.0
+info:
+  title: Watch Collection API
+  description: Saat koleksiyonu yönetim sistemi API dokümantasyonu
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+
+paths:
+  /watches:
+    get:
+      summary: Tüm saatleri listele
+      tags: [Watches]
+      parameters:
+        - in: query
+          name: brand
+          schema:
+            type: string
+          description: Markaya göre filtrele
+        - in: query
+          name: movement_type
+          schema:
+            type: string
+            enum: [Automatic, Manual, Quartz, Mecha-Quartz]
+          description: Mekanizma tipine göre filtrele
+        - in: query
+          name: case_material
+          schema:
+            type: string
+            enum: [Steel, Gold, Titanium, Ceramic]
+          description: Kasa materyaline göre filtrele
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Watch'
+
+    post:
+      summary: Yeni saat ekle
+      tags: [Watches]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WatchInput'
+      responses:
+        '201':
+          description: Saat oluşturuldu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Watch'
+        '400':
+          description: Validasyon hatası
+
+  /watches/stats:
+    get:
+      summary: Koleksiyon istatistikleri
+      tags: [Stats]
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      metrics:
+                        type: object
+                        properties:
+                          watchCount:
+                            type: integer
+                          totalPurchaseValue:
+                            type: number
+                          totalMarketValue:
+                            type: number
+                          totalGainLoss:
+                            type: number
+                          gainLossPercent:
+                            type: number
+                          mostValuable:
+                            $ref: '#/components/schemas/Watch'
+                      brandDistribution:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            brand:
+                              type: string
+                            count:
+                              type: integer
+
+  /watches/{id}:
+    get:
+      summary: Tek saat getir
+      tags: [Watches]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Watch'
+        '404':
+          description: Saat bulunamadı
+
+    put:
+      summary: Saati güncelle
+      tags: [Watches]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WatchInput'
+      responses:
+        '200':
+          description: Güncellendi
+        '404':
+          description: Saat bulunamadı
+        '400':
+          description: Validasyon hatası
+
+    delete:
+      summary: Saati sil
+      tags: [Watches]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Silindi
+        '404':
+          description: Saat bulunamadı
+
+components:
+  schemas:
+    Watch:
+      type: object
+      properties:
+        id:
+          type: integer
+        brand:
+          type: string
+        model:
+          type: string
+        reference_number:
+          type: string
+        production_year:
+          type: integer
+        movement_type:
+          type: string
+          enum: [Automatic, Manual, Quartz, Mecha-Quartz]
+        caliber:
+          type: string
+        power_reserve:
+          type: integer
+        bph:
+          type: integer
+        case_material:
+          type: string
+          enum: [Steel, Gold, Titanium, Ceramic]
+        case_diameter:
+          type: number
+        case_thickness:
+          type: number
+        lug_width:
+          type: integer
+        water_resistance:
+          type: integer
+        dial_color:
+          type: string
+        index_type:
+          type: string
+          enum: [Roman, Arabic, Baton]
+        crystal_type:
+          type: string
+          enum: [Sapphire, Mineral, Hesalite]
+        luminescence:
+          type: integer
+          enum: [0, 1]
+        strap_material:
+          type: string
+          enum: [Leather, Steel, Rubber, NATO]
+        buckle_type:
+          type: string
+          enum: [Buckle, Deployant]
+        purchase_price:
+          type: number
+        current_market_value:
+          type: number
+        created_at:
+          type: string
+        updated_at:
+          type: string
+
+    WatchInput:
+      type: object
+      required:
+        - brand
+        - model
+      properties:
+        brand:
+          type: string
+          example: Rolex
+        model:
+          type: string
+          example: Submariner
+        reference_number:
+          type: string
+          example: 126610LN
+        production_year:
+          type: integer
+          example: 2021
+        movement_type:
+          type: string
+          enum: [Automatic, Manual, Quartz, Mecha-Quartz]
+          example: Automatic
+        caliber:
+          type: string
+          example: Cal. 3235
+        power_reserve:
+          type: integer
+          example: 70
+        bph:
+          type: integer
+          example: 28800
+        case_material:
+          type: string
+          enum: [Steel, Gold, Titanium, Ceramic]
+          example: Steel
+        case_diameter:
+          type: number
+          example: 41
+        case_thickness:
+          type: number
+          example: 12.5
+        lug_width:
+          type: integer
+          example: 20
+        water_resistance:
+          type: integer
+          example: 300
+        dial_color:
+          type: string
+          example: Black
+        index_type:
+          type: string
+          enum: [Roman, Arabic, Baton]
+          example: Baton
+        crystal_type:
+          type: string
+          enum: [Sapphire, Mineral, Hesalite]
+          example: Sapphire
+        luminescence:
+          type: integer
+          enum: [0, 1]
+          example: 1
+        strap_material:
+          type: string
+          enum: [Leather, Steel, Rubber, NATO]
+          example: Steel
+        buckle_type:
+          type: string
+          enum: [Buckle, Deployant]
+          example: Deployant
+        purchase_price:
+          type: number
+          example: 12000
+        current_market_value:
+          type: number
+          example: 15000

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Watch Collection</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="logo">⌚ Watch Collection</span>
+    <div class="nav-links">
+      <button onclick="showPage('list')">Koleksiyon</button>
+      <button onclick="showPage('add')">+ Yeni Saat</button>
+      <button onclick="showPage('stats')">İstatistikler</button>
+    </div>
+  </nav>
+
+  <!-- SAYFA: Liste -->
+  <div id="page-list" class="page">
+    <div class="filter-bar">
+      <input type="text" id="filter-brand" placeholder="Marka ara..." />
+      <select id="filter-movement">
+        <option value="">Tüm Mekanizmalar</option>
+        <option>Automatic</option>
+        <option>Manual</option>
+        <option>Quartz</option>
+        <option>Mecha-Quartz</option>
+      </select>
+      <select id="filter-material">
+        <option value="">Tüm Materyaller</option>
+        <option>Steel</option>
+        <option>Gold</option>
+        <option>Titanium</option>
+        <option>Ceramic</option>
+      </select>
+      <button onclick="loadWatches()">Filtrele</button>
+    </div>
+    <div id="watch-list" class="watch-grid"></div>
+  </div>
+
+  <!-- SAYFA: Ekle/Düzenle -->
+  <div id="page-add" class="page hidden">
+    <div class="form-container">
+      <h2 id="form-title">Yeni Saat Ekle</h2>
+
+      <!-- ADIM GÖSTERGESİ -->
+      <div class="steps">
+        <span class="step active" data-step="1">Temel</span>
+        <span class="step" data-step="2">Mekanizma</span>
+        <span class="step" data-step="3">Kasa</span>
+        <span class="step" data-step="4">Kadran</span>
+        <span class="step" data-step="5">Kordon</span>
+        <span class="step" data-step="6">Finansal</span>
+      </div>
+
+      <!-- ADIM 1: Temel -->
+      <div class="form-step" id="step-1">
+        <div class="form-group">
+          <label>Marka *</label>
+          <input type="text" id="f-brand" placeholder="Rolex" />
+        </div>
+        <div class="form-group">
+          <label>Model *</label>
+          <input type="text" id="f-model" placeholder="Submariner" />
+        </div>
+        <div class="form-group">
+          <label>Referans No</label>
+          <input type="text" id="f-reference_number" placeholder="126610LN" />
+        </div>
+        <div class="form-group">
+          <label>Üretim Yılı</label>
+          <input type="number" id="f-production_year" placeholder="2021" />
+        </div>
+      </div>
+
+      <!-- ADIM 2: Mekanizma -->
+      <div class="form-step hidden" id="step-2">
+        <div class="form-group">
+          <label>Mekanizma Tipi</label>
+          <select id="f-movement_type">
+            <option value="">Seçin</option>
+            <option>Automatic</option>
+            <option>Manual</option>
+            <option>Quartz</option>
+            <option>Mecha-Quartz</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Kalibre No</label>
+          <input type="text" id="f-caliber" placeholder="Cal. 3235" />
+        </div>
+        <div class="form-group">
+          <label>Güç Rezervi (Saat)</label>
+          <input type="number" id="f-power_reserve" placeholder="70" />
+        </div>
+        <div class="form-group">
+          <label>Titreşim (BPH)</label>
+          <input type="number" id="f-bph" placeholder="28800" />
+        </div>
+      </div>
+
+      <!-- ADIM 3: Kasa -->
+      <div class="form-step hidden" id="step-3">
+        <div class="form-group">
+          <label>Kasa Materyali</label>
+          <select id="f-case_material">
+            <option value="">Seçin</option>
+            <option>Steel</option>
+            <option>Gold</option>
+            <option>Titanium</option>
+            <option>Ceramic</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Çap (mm)</label>
+          <input type="number" id="f-case_diameter" placeholder="41" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label>Kalınlık (mm)</label>
+          <input type="number" id="f-case_thickness" placeholder="12.5" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label>Boynuz Genişliği (mm)</label>
+          <input type="number" id="f-lug_width" placeholder="20" />
+        </div>
+        <div class="form-group">
+          <label>Su Geçirmezlik (metre)</label>
+          <input type="number" id="f-water_resistance" placeholder="300" />
+        </div>
+      </div>
+
+      <!-- ADIM 4: Kadran -->
+      <div class="form-step hidden" id="step-4">
+        <div class="form-group">
+          <label>Kadran Rengi</label>
+          <input type="text" id="f-dial_color" placeholder="Black" />
+        </div>
+        <div class="form-group">
+          <label>İndeks Tipi</label>
+          <select id="f-index_type">
+            <option value="">Seçin</option>
+            <option>Roman</option>
+            <option>Arabic</option>
+            <option>Baton</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cam Tipi</label>
+          <select id="f-crystal_type">
+            <option value="">Seçin</option>
+            <option>Sapphire</option>
+            <option>Mineral</option>
+            <option>Hesalite</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Lüminesans</label>
+          <select id="f-luminescence">
+            <option value="0">Yok</option>
+            <option value="1">Var</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ADIM 5: Kordon -->
+      <div class="form-step hidden" id="step-5">
+        <div class="form-group">
+          <label>Kordon Materyali</label>
+          <select id="f-strap_material">
+            <option value="">Seçin</option>
+            <option>Leather</option>
+            <option>Steel</option>
+            <option>Rubber</option>
+            <option>NATO</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Toka Tipi</label>
+          <select id="f-buckle_type">
+            <option value="">Seçin</option>
+            <option>Buckle</option>
+            <option>Deployant</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ADIM 6: Finansal -->
+      <div class="form-step hidden" id="step-6">
+        <div class="form-group">
+          <label>Alış Fiyatı (₺)</label>
+          <input type="number" id="f-purchase_price" placeholder="50000" />
+        </div>
+        <div class="form-group">
+          <label>Güncel Piyasa Değeri (₺)</label>
+          <input type="number" id="f-current_market_value" placeholder="65000" />
+        </div>
+      </div>
+
+      <div id="form-error" class="error-msg hidden"></div>
+
+      <!-- BUTONLAR -->
+      <div class="form-nav">
+        <button id="btn-prev" class="btn-secondary hidden" onclick="prevStep()">← Geri</button>
+        <button id="btn-next" class="btn-primary" onclick="nextStep()">İleri →</button>
+        <button id="btn-submit" class="btn-primary hidden" onclick="submitForm()">Kaydet ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAYFA: İstatistikler -->
+  <div id="page-stats" class="page hidden">
+    <div class="stats-container">
+      <h2>Koleksiyon İstatistikleri</h2>
+      <div id="stats-content"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Detay/Düzenle -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
