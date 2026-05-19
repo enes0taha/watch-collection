@@ -1,4 +1,23 @@
-const API = 'http://localhost:3000/api/watches';
+// Token kontrolü — giriş yapılmamışsa login sayfasına yönlendir
+const token = localStorage.getItem('token');
+if (!token) window.location.href = '/login.html';
+
+const username = localStorage.getItem('username');
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('username');
+  window.location.href = '/login.html';
+}
+
+document.getElementById('nav-username').textContent = username ? `👤 ${username}` : '';
+
+const API = '/api/watches';
+
+const authHeaders = () => ({
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${token}`,
+});
 
 let currentStep = 1;
 const totalSteps = 6;
@@ -142,7 +161,11 @@ async function loadWatches() {
   if (movement) url += `movement_type=${encodeURIComponent(movement)}&`;
   if (material) url += `case_material=${encodeURIComponent(material)}&`;
 
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: authHeaders() });
+  if (res.status === 401 || res.status === 403) {
+    logout();
+    return;
+  }
   const json = await res.json();
   renderWatches(json.data || []);
 }
@@ -155,7 +178,7 @@ async function submitForm() {
 
   const res = await fetch(url, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -167,18 +190,18 @@ async function submitForm() {
 
 async function deleteWatch(id) {
   if (!confirm('Bu saati silmek istediğinizden emin misiniz?')) return;
-  await fetch(`${API}/${id}`, { method: 'DELETE' });
+  await fetch(`${API}/${id}`, { method: 'DELETE', headers: authHeaders() });
   loadWatches();
 }
 
 async function loadStats() {
-  const res = await fetch(`${API}/stats`);
+  const res = await fetch(`${API}/stats`, { headers: authHeaders() });
   const json = await res.json();
   renderStats(json.data);
 }
 
 async function editWatch(id) {
-  const res = await fetch(`${API}/${id}`);
+  const res = await fetch(`${API}/${id}`, { headers: authHeaders() });
   const json = await res.json();
   const w = json.data;
 
@@ -186,7 +209,6 @@ async function editWatch(id) {
   document.getElementById('form-title').textContent = 'Saati Düzenle';
   showPage('add');
 
-  // Forma doldur
   const fields = [
     'brand','model','reference_number','production_year',
     'movement_type','caliber','power_reserve','bph',

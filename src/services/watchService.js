@@ -1,16 +1,13 @@
 import * as repo from '../database/watchRepository.js';
 
-// --- VALIDATION ---
 export const validateWatch = (data) => {
   const errors = [];
 
-  // Zorunlu alanlar
   if (!data.brand || data.brand.trim() === '')
     errors.push('Marka zorunludur.');
   if (!data.model || data.model.trim() === '')
     errors.push('Model zorunludur.');
 
-  // Üretim yılı
   const currentYear = new Date().getFullYear();
   if (data.production_year !== undefined && data.production_year !== '') {
     const year = Number(data.production_year);
@@ -18,7 +15,6 @@ export const validateWatch = (data) => {
       errors.push(`Üretim yılı 1800 ile ${currentYear} arasında olmalıdır.`);
   }
 
-  // Fiyat kontrolleri
   if (data.purchase_price !== undefined && data.purchase_price !== '') {
     if (Number(data.purchase_price) < 0)
       errors.push('Alış fiyatı negatif olamaz.');
@@ -28,14 +24,12 @@ export const validateWatch = (data) => {
       errors.push('Piyasa değeri negatif olamaz.');
   }
 
-  // Kasa ölçüleri
   if (data.case_diameter !== undefined && data.case_diameter !== '') {
     const d = Number(data.case_diameter);
     if (isNaN(d) || d < 20 || d > 60)
       errors.push('Kasa çapı 20mm ile 60mm arasında olmalıdır.');
   }
 
-  // Enum kontrolleri
   const validMovements = ['Automatic', 'Manual', 'Quartz', 'Mecha-Quartz'];
   if (data.movement_type && !validMovements.includes(data.movement_type))
     errors.push('Geçersiz mekanizma tipi.');
@@ -46,8 +40,6 @@ export const validateWatch = (data) => {
 
   return errors;
 };
-
-// --- PURE FUNCTIONS (unit test edilebilir) ---
 
 export const calculateCollectionMetrics = (watches) => {
   if (!watches || watches.length === 0) {
@@ -61,12 +53,8 @@ export const calculateCollectionMetrics = (watches) => {
     };
   }
 
-  const totalPurchaseValue = watches.reduce(
-    (sum, w) => sum + (w.purchase_price || 0), 0
-  );
-  const totalMarketValue = watches.reduce(
-    (sum, w) => sum + (w.current_market_value || 0), 0
-  );
+  const totalPurchaseValue = watches.reduce((sum, w) => sum + (w.purchase_price || 0), 0);
+  const totalMarketValue = watches.reduce((sum, w) => sum + (w.current_market_value || 0), 0);
   const totalGainLoss = totalMarketValue - totalPurchaseValue;
   const gainLossPercent = totalPurchaseValue > 0
     ? ((totalGainLoss / totalPurchaseValue) * 100).toFixed(2)
@@ -88,50 +76,43 @@ export const calculateCollectionMetrics = (watches) => {
 
 export const getBrandDistribution = (watches) => {
   const dist = {};
-  watches.forEach(w => {
-    dist[w.brand] = (dist[w.brand] || 0) + 1;
-  });
-  // Sıralı döndür
+  watches.forEach(w => { dist[w.brand] = (dist[w.brand] || 0) + 1; });
   return Object.entries(dist)
     .sort((a, b) => b[1] - a[1])
     .map(([brand, count]) => ({ brand, count }));
 };
 
-// --- CRUD OPERASYONLARI ---
+export const getAllWatches = (userId, filters) => repo.findAll(userId, filters);
 
-export const getAllWatches = (filters) => {
-  return repo.findAll(filters);
-};
-
-export const getWatchById = (id) => {
-  const watch = repo.findById(id);
+export const getWatchById = (id, userId) => {
+  const watch = repo.findById(id, userId);
   if (!watch) throw new Error('Saat bulunamadı.');
   return watch;
 };
 
-export const createWatch = (data) => {
+export const createWatch = (data, userId) => {
   const errors = validateWatch(data);
   if (errors.length > 0) throw new Error(errors.join(' '));
-  return repo.create(data);
+  return repo.create(data, userId);
 };
 
-export const updateWatch = (id, data) => {
-  const existing = repo.findById(id);
+export const updateWatch = (id, userId, data) => {
+  const existing = repo.findById(id, userId);
   if (!existing) throw new Error('Saat bulunamadı.');
   const errors = validateWatch(data);
   if (errors.length > 0) throw new Error(errors.join(' '));
-  return repo.update(id, data);
+  return repo.update(id, userId, data);
 };
 
-export const deleteWatch = (id) => {
-  const existing = repo.findById(id);
+export const deleteWatch = (id, userId) => {
+  const existing = repo.findById(id, userId);
   if (!existing) throw new Error('Saat bulunamadı.');
-  repo.remove(id);
+  repo.remove(id, userId);
   return { message: 'Saat silindi.' };
 };
 
-export const getStats = () => {
-  const watches = repo.findAll();
+export const getStats = (userId) => {
+  const watches = repo.findAll(userId);
   return {
     metrics: calculateCollectionMetrics(watches),
     brandDistribution: getBrandDistribution(watches),

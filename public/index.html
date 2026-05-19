@@ -9,13 +9,15 @@
 <body>
 
   <nav class="navbar">
-    <span class="logo">⌚ Watch Collection</span>
-    <div class="nav-links">
-      <button onclick="showPage('list')">Koleksiyon</button>
-      <button onclick="showPage('add')">+ Yeni Saat</button>
-      <button onclick="showPage('stats')">İstatistikler</button>
-    </div>
-  </nav>
+  <span class="logo">⌚ Watch Collection</span>
+  <div class="nav-links">
+    <button onclick="showPage('list')">Koleksiyon</button>
+    <button onclick="showPage('add')">+ Yeni Saat</button>
+    <button onclick="showPage('stats')">İstatistikler</button>
+    <span id="nav-username" style="color:#c9a84c; margin-left:1rem; font-size:0.9rem"></span>
+    <button onclick="logout()" style="border-color:#6b2a2a; color:#e07070">Çıkış</button>
+  </div>
+</nav>
 
   <!-- SAYFA: Liste -->
   <div id="page-list" class="page">

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Watch Collection — Giriş</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-box">
+      <div class="auth-logo">⌚ Watch Collection</div>
+
+      <div class="auth-tabs">
+        <button id="tab-login" class="auth-tab active" onclick="switchTab('login')">Giriş Yap</button>
+        <button id="tab-register" class="auth-tab" onclick="switchTab('register')">Kayıt Ol</button>
+      </div>
+
+      <!-- GİRİŞ FORMU -->
+      <div id="form-login">
+        <div class="form-group">
+          <label>Kullanıcı Adı</label>
+          <input type="text" id="login-username" placeholder="kullanici_adi" />
+        </div>
+        <div class="form-group">
+          <label>Şifre</label>
+          <input type="password" id="login-password" placeholder="••••••" />
+        </div>
+        <div id="login-error" class="error-msg hidden"></div>
+        <button class="btn-primary" style="width:100%; margin-top:1rem" onclick="handleLogin()">Giriş Yap</button>
+      </div>
+
+      <!-- KAYIT FORMU -->
+      <div id="form-register" class="hidden">
+        <div class="form-group">
+          <label>Kullanıcı Adı</label>
+          <input type="text" id="reg-username" placeholder="kullanici_adi" />
+        </div>
+        <div class="form-group">
+          <label>Şifre</label>
+          <input type="password" id="reg-password" placeholder="En az 6 karakter" />
+        </div>
+        <div id="register-error" class="error-msg hidden"></div>
+        <div id="register-success" class="success-msg hidden"></div>
+        <button class="btn-primary" style="width:100%; margin-top:1rem" onclick="handleRegister()">Kayıt Ol</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Zaten giriş yapılmışsa ana sayfaya yönlendir
+    if (localStorage.getItem('token')) {
+      window.location.href = '/';
+    }
+
+    function switchTab(tab) {
+      document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+      document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    }
+
+    async function handleLogin() {
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errorDiv = document.getElementById('login-error');
+      errorDiv.classList.add('hidden');
+
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        errorDiv.textContent = json.error;
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      localStorage.setItem('token', json.data.token);
+      localStorage.setItem('username', json.data.username);
+      window.location.href = '/';
+    }
+
+    async function handleRegister() {
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const errorDiv = document.getElementById('register-error');
+      const successDiv = document.getElementById('register-success');
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        errorDiv.textContent = json.error;
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      successDiv.textContent = 'Kayıt başarılı! Giriş yapabilirsiniz.';
+      successDiv.classList.remove('hidden');
+      setTimeout(() => switchTab('login'), 1500);
+    }
+
+    // Enter tuşu desteği
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const activeForm = document.getElementById('form-login').classList.contains('hidden')
+          ? 'register' : 'login';
+        if (activeForm === 'login') handleLogin();
+        else handleRegister();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -8,8 +8,17 @@ const db = new Database(process.env.DB_PATH || './watches.db');
 db.pragma('journal_mode = WAL');
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
   CREATE TABLE IF NOT EXISTS watches (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+
     brand TEXT NOT NULL,
     model TEXT NOT NULL,
     reference_number TEXT,
@@ -31,9 +40,12 @@ db.exec(`
     buckle_type TEXT CHECK(buckle_type IN ('Buckle','Deployant')),
     purchase_price REAL,
     current_market_value REAL,
+
     created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now'))
-  )
+    updated_at TEXT DEFAULT (datetime('now')),
+
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
 `);
 
 export default db;

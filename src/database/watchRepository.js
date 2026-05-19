@@ -1,8 +1,8 @@
 import db from './db.js';
 
-export const findAll = (filters = {}) => {
-  let query = 'SELECT * FROM watches WHERE 1=1';
-  const params = [];
+export const findAll = (userId, filters = {}) => {
+  let query = 'SELECT * FROM watches WHERE user_id = ?';
+  const params = [userId];
 
   if (filters.brand) {
     query += ' AND brand LIKE ?';
@@ -21,13 +21,14 @@ export const findAll = (filters = {}) => {
   return db.prepare(query).all(...params);
 };
 
-export const findById = (id) => {
-  return db.prepare('SELECT * FROM watches WHERE id = ?').get(id);
+export const findById = (id, userId) => {
+  return db.prepare('SELECT * FROM watches WHERE id = ? AND user_id = ?').get(id, userId);
 };
 
-export const create = (data) => {
+export const create = (data, userId) => {
   const stmt = db.prepare(`
     INSERT INTO watches (
+      user_id,
       brand, model, reference_number, production_year,
       movement_type, caliber, power_reserve, bph,
       case_material, case_diameter, case_thickness, lug_width, water_resistance,
@@ -35,6 +36,7 @@ export const create = (data) => {
       strap_material, buckle_type,
       purchase_price, current_market_value
     ) VALUES (
+      @user_id,
       @brand, @model, @reference_number, @production_year,
       @movement_type, @caliber, @power_reserve, @bph,
       @case_material, @case_diameter, @case_thickness, @lug_width, @water_resistance,
@@ -43,11 +45,11 @@ export const create = (data) => {
       @purchase_price, @current_market_value
     )
   `);
-  const result = stmt.run(data);
-  return findById(result.lastInsertRowid);
+  const result = stmt.run({ ...data, user_id: userId });
+  return findById(result.lastInsertRowid, userId);
 };
 
-export const update = (id, data) => {
+export const update = (id, userId, data) => {
   const stmt = db.prepare(`
     UPDATE watches SET
       brand = @brand, model = @model,
@@ -62,12 +64,12 @@ export const update = (id, data) => {
       buckle_type = @buckle_type, purchase_price = @purchase_price,
       current_market_value = @current_market_value,
       updated_at = datetime('now')
-    WHERE id = @id
+    WHERE id = @id AND user_id = @user_id
   `);
-  stmt.run({ ...data, id });
-  return findById(id);
+  stmt.run({ ...data, id, user_id: userId });
+  return findById(id, userId);
 };
 
-export const remove = (id) => {
-  return db.prepare('DELETE FROM watches WHERE id = ?').run(id);
+export const remove = (id, userId) => {
+  return db.prepare('DELETE FROM watches WHERE id = ? AND user_id = ?').run(id, userId);
 };
