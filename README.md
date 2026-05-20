@@ -32,7 +32,8 @@ Saat koleksiyonu yönetim sistemi. Node.js, Express ve SQLite ile geliştirilmi�
 
         PORT=3000
         DB_PATH=./watches.db
-
+        JWT_SECRET=watch_collection_super_secret_key_2026
+        
 4. Geliştirme sunucusunu başlat
 
         npm run dev
