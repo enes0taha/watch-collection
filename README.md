@@ -92,7 +92,8 @@ Swagger UI: http://localhost:3000/api-docs
 
 ## Proje Yapısı
 
-    watch-collection/
+    ```plaintext
+watch-collection/
 ├── src/
 │   ├── database/
 │   │   ├── db.js              # SQLite bağlantısı ve şema
@@ -116,6 +117,7 @@ Swagger UI: http://localhost:3000/api-docs
 ├── swagger.yaml               # API dokümantasyonu
 ├── server.js                  # Giriş noktası
 └── README.md
+```
 
 ## Yeniden Üretim
 
