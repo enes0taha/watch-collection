@@ -93,24 +93,29 @@ Swagger UI: http://localhost:3000/api-docs
 ## Proje Yapısı
 
     watch-collection/
-    ├── src/
-    │   ├── database/
-    │   │   ├── db.js              # SQLite bağlantısı ve şema
-    │   │   └── watchRepository.js # SQL sorguları
-    │   ├── routes/
-    │   │   └── watchRoutes.js     # HTTP endpoint'leri
-    │   ├── services/
-    │   │   └── watchService.js    # İş mantığı ve validasyon
-    │   └── app.js                 # Express kurulumu
-    ├── public/                    # Vanilla JS frontend
-    │   ├── index.html
-    │   ├── app.js
-    │   └── style.css
-    ├── test/
-    │   └── watchService.test.js   # Unit testler
-    ├── swagger.yaml               # API dokümantasyonu
-    ├── server.js                  # Giriş noktası
-    └── README.md
+├── src/
+│   ├── database/
+│   │   ├── db.js              # SQLite bağlantısı ve şema
+│   │   └── watchRepository.js # SQL sorguları
+│   ├── middleware/
+│   │   └── auth.js            # Kimlik doğrulama middleware
+│   ├── routes/
+│   │   ├── authRoutes.js      # Auth endpoint'leri
+│   │   └── watchRoutes.js     # Saat endpoint'leri
+│   ├── services/
+│   │   ├── authService.js     # Auth iş mantığı
+│   │   └── watchService.js    # Saat iş mantığı ve validasyon
+│   └── app.js                 # Express kurulumu
+├── public/                    # Vanilla JS frontend
+│   ├── index.html
+│   ├── login.html
+│   ├── app.js
+│   └── style.css
+├── test/
+│   └── watchService.test.js   # Unit testler
+├── swagger.yaml               # API dokümantasyonu
+├── server.js                  # Giriş noktası
+└── README.md
 
 ## Yeniden Üretim
 
