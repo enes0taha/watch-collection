@@ -1,4 +1,6 @@
 node_modules/
 watches.db
+watches.db-shm
+watches.db-wal
 .env
 coverage/
