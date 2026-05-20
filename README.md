@@ -92,7 +92,7 @@ Swagger UI: http://localhost:3000/api-docs
 
 ## Proje Yapısı
 
-    ```plaintext
+    ```
 watch-collection/
 ├── src/
 │   ├── database/
